@@ -3,8 +3,6 @@
 '''
 
 ''' Performs, iteratively, the Horowitz-Sahni algorithms for 0-1 KP problem.
-    INVARIANT: the elements to put in the knapsack must be ordered according
-                to the ratio value/cost (vector e), from the highest to the lowest.
     Tries to add as much elements to the set as possible according to their
     scaled value ("forward move") and then, when it funds a critical element 
     (i.e. one that cannot be added to the knapsack) estimates an upper bound
@@ -19,10 +17,6 @@
     
     @param p:   List of elements' values;
     @param w:   List of elements' weights;
-    @param e:   List of elements' scaled values: e[i] = p[i]/w[i]
-                The elements available are sorted according to the 'e' vector.
-                The i-th element has value p[i], weight w[i].
-    @param N:   The number of elements available;
     @param c:   Total capacity of the knapsack;
     @return:    A tuple with 3 elements:
                 1)    The best value found for the knapsack (the solution
@@ -31,10 +25,26 @@
                 3)    A bitmask identifying the elements belonging to the
                       solution.
 '''
-def horowitz_sahni(p, w, e, N, c):
+def horowitz_sahni(p, w, c):
+
+    if len(p) != len(w):
+        print('knapsack error - not matched length')
+        return 0, 0, []
+
+    # The number of elements available;
+    N = len(p)
     
     if N == 0:
         return 0, 0, []
+
+    # List of elements' scaled values: e[i] = p[i]/w[i]
+    # The elements available are sorted according to the 'e' vector.
+    # The i-th element has value p[i], weight w[i].
+    e = [p[i] / w[i] for i, _ in enumerate(p)]
+
+    # the elements to put in the knapsack must be ordered according
+    # to the ratio value/cost (vector e), from the highest to the lowest.
+    e, p, w = zip(*sorted(zip(e, p, w), reverse=True))
         
     mask = [0] * N
     best_solution_mask = mask[:]
